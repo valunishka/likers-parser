@@ -99,7 +99,7 @@ var LikersFeed = React.createClass({
 
 		//TODO match photo id
 		// if (url) url = url.match(/\/([\w\d]+)$/)[1];
-		actions.loadLikesFromUrl( url || 'https://vk.com/mdk?z=photo-10639516_361350455%2Falbum-10639516_00%2Frev' );
+		actions.loadLikersFromPhotoUrl( url || 'https://vk.com/mdk?z=photo-10639516_361350455%2Falbum-10639516_00%2Frev' );
 	},
 
 	render: function() {
@@ -129,21 +129,17 @@ var LikersFeed = React.createClass({
 		});
 
 		return (
-			<div className="posts-wrapper container">
+			<div className='posts-wrapper container'>
 				<Jumbotron>
 					<h1>Find your destiny</h1>
 					<p>Тут ты, кароч, можешь найти себе тянку.</p>
 				</Jumbotron>
-				<section className="post-finder-dashboard row">
+				<section className='post-finder-dashboard row'>
 					<Input
-						type='text'
-						value= ''
-						placeholder='Enter text'
+						type={'text'}
+						placeholder='https://vk.com/mdk?z=photo-10639516_361350455%2Falbum-10639516_00%2Frev'
 						label='Ссылка на пикчу'
-						ref='urlInput'
-						groupClassName='group-class'
-						wrapperClassName='wrapper-class'
-						labelClassName='label-class' />
+						ref='urlInput' />
 					<Button
 						onClick={ this.onNewSearch }
 						bsStyle="primary" >
