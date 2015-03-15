@@ -9,24 +9,41 @@ var urlFormatOptions = {
 
 module.exports = {
 
-	getPhotoInfoUrl: function( photoUrl ) {
+	// _getLikersInfoUrl: function( photoInfo ) {
+	// 	return nodeUrl.format(_.extend( urlFormatOptions, {
+	// 		path: 'method/likes.getList',
+	// 		query: {
+	// 			'item_id': likers
+	// 		}
+	// 	}));
+	// 	var ownerId = photoInfo.owner_id,
+	// 		itemId = photoInfo.id,
+	// 		photoSrc = photoInfo.photo_big;
+	// 	return new Promise(function( resolve, reject ) {
+	// 		VK.Api.
+	// 	});
+	// },
 
-		var photoId = photoUrl.match(/photo-([\d\_]+)/)[1];
-
-		return nodeUrl.format(_.extend( urlFormatOptions, {
-			path: 'method/photos.getById',
-			query: {
-				'photos': photoId
-			}
-		}));
+	_getPhotoInfo: function( photoUrl ) {
+		var photoId = photoUrl.match(/photo([\-\d\_]+)/)[1];
+		return new Promise(function( resolve ) {
+			VK.Api.call('photos.getById', { photos : photoId }, function( response ) {
+				resolve( response.response[0] );
+			});
+		});
 	},
 
-	getLikersInfoUrl: function( photoInfo ) {
-		return nodeUrl.format(_.extend( urlFormatOptions, {
-			path: 'method/likes.getList',
-			query: {
-				'item_id': likers
-			}
-		}));
+	_countUsers: function( ownerId, itemId ) {
+		var query = {
+			owner_id : ownerId,
+			item_id : itemId
+		}
+		VK.Api.call('execute.countLikes', query, function( response ) {
+
+		});
+	},
+
+	loadLikersFromPhotoUrl: function( photoUrl ) {
+
 	}
 };
