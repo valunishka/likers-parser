@@ -4,6 +4,9 @@
   "description": "Foxy hunting like: Search chicks who miss me",
   "author": "",
   "license": "MIT",
+  "engines": {
+    "node": "0.12.x"
+  },
   "devDependencies": {
     "babelify": "^5.0.3",
     "browserify": "^9.0.3",
@@ -24,6 +27,7 @@
   "dependencies": {
     "flux": "^2.0.1",
     "object-assign": "^2.0.0",
+    "express": "~4.12.2",
     "react": "~0.12.0",
     "react-waypoint": "~0.3.0",
     "react-bootstrap": "^0.16.1",
