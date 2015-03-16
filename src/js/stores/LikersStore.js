@@ -3,6 +3,9 @@
 var Reflux = require('reflux');
 var actions = require('../actions/Actions');
 var vkapi = require('../services/vkapi');
+var _ = require('underscore');
+
+var cities = require('../services/cities');
 
 var LIKERS_PER_PAGE = 50;
 
@@ -23,6 +26,7 @@ var LikersStore = Reflux.createStore({
 			isLoading: false,
 			filterOptions: {
 				currentValue: 'All',
+				cityFilter: null,
 				values: {
 					'All': 'All',
 					'City': 2,
@@ -45,9 +49,12 @@ var LikersStore = Reflux.createStore({
 
 	setFilterBy: function( value ) {
 		this.settings.filterOptions.currentValue = value;
-		// var filteredPosts = this.getFilteredPosts(value);
-		var filteredPosts = this.currentPuclicData.posts;
+		this.trigger(this._getThisData());
+	},
 
+	setCityFilterBy: function( city ) {
+		this.settings.filterOptions.cityFilter = city.toLowerCase();
+		console.log('Cities', cities.getCitiesInfo());
 		this.trigger(this._getThisData());
 	},
 
@@ -78,16 +85,15 @@ var LikersStore = Reflux.createStore({
 		console.log("Load likers from photo url");
 		// this.trigger( this._getThisData() );
 
-		request
-			.get('/all')
-			.end(function( err, res ) {
-				console.log('Response', res);
-				this.currentPuclicData = res;
-				this.trigger({
-					currentPuclicData: this.currentPuclicData,
-					settings
-				});
+		vkapi.loadLikersFromPhotoUrl( url ).then(_.bind(function( res ) {
+			this.likers = res;
+			this.trigger({
+				likers: res,
+				settings: this.settings
 			});
+		}, this)).catch(( err ) => {
+			console.log('Error! - ', err);
+		});
 	},
 
 

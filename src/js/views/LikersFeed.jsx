@@ -13,6 +13,8 @@ var _          = require('underscore');
 var Jumbotron = require('react-bootstrap/lib/Jumbotron');
 var Input = require('react-bootstrap/lib/Input');
 var Button = require('react-bootstrap/lib/Button');
+var Grid = require('react-bootstrap/lib/Grid');
+var Row = require('react-bootstrap/lib/Row');
 
 var LikersFeed = React.createClass({
 
@@ -73,7 +75,7 @@ var LikersFeed = React.createClass({
 
 		var currentPage = this.state.currentPage || 1;
 
-		actions.setFilterBy(this.refs.filterBy.getDOMNode().value);
+		actions.setFilterBy(this.refs.filterBy.getDOMNode().querySelector('input').value);
 		this.setState({
 			isLoading: true
 		});
@@ -84,6 +86,13 @@ var LikersFeed = React.createClass({
 		// } else {
 		// 	this.transitionTo('posts', { pageNum: 1 });
 		// }
+
+	},
+
+	updateCityFilterBy: function( event ) {
+		event.preventDefault();
+
+		actions.setCityFilterBy( this.refs.cityFilterInput.getDOMNode().querySelector('input').value );
 
 	},
 
@@ -107,6 +116,7 @@ var LikersFeed = React.createClass({
 			currentPage = this.state.currentPage || 1,
 			sortOptions = this.state.sortOptions,
 			filterOptions = this.state.filterOptions,
+			cityFilter = this.state.filterOptions.cityFilter,
 			filterValues = Object.keys(filterOptions.values),
 			sortValues = Object.keys(sortOptions.values);
 
@@ -116,7 +126,8 @@ var LikersFeed = React.createClass({
 				<Liker
 					liker={ liker }
 					filterBy={ filterOptions.values[filterOptions.currentValue] }
-					key={ liker.id } />
+					cityFilter={ cityFilter }
+					key={ liker.uid } />
 			);
 		});
 
@@ -132,18 +143,28 @@ var LikersFeed = React.createClass({
 			<div className='posts-wrapper container'>
 				<Jumbotron>
 					<h1>Find your destiny</h1>
-					<p>Тут ты, кароч, можешь найти себе тянку.</p>
+					<p>Тут, ты, кароч, можешь найти себе тянку.</p>
 				</Jumbotron>
-				<section className='post-finder-dashboard row'>
+				<section className={ 'post-finder-dashboard row' }>
 					<Input
 						type={'text'}
 						placeholder='https://vk.com/mdk?z=photo-10639516_361350455%2Falbum-10639516_00%2Frev'
-						label='Ссылка на пикчу'
-						ref='urlInput' />
+						label={ 'Ссылка на пикчу' }
+						ref={ 'urlInput' } />
 					<Button
 						onClick={ this.onNewSearch }
-						bsStyle="primary" >
+						bsStyle={ 'primary' } >
 						Make magic
+					</Button>
+					<Input
+						type={ 'text' }
+						placeholder={ 'Moscow' }
+						label={ 'Фильтрация по городу'}
+						ref={ 'cityFilterInput' } />
+					<Button
+						onClick={ this.updateCityFilterBy }
+						bsStyle="primary" >
+						Filter
 					</Button>
 					<div className='three columns sex-filter-container'>
 						<select
@@ -153,13 +174,6 @@ var LikersFeed = React.createClass({
 							ref='filterBy'>
 							{ filterOptions }
 						</select>
-					</div>
-					<div className='three columns search-button-container'>
-						<button
-							onClick={ this.onNewSearch }
-							className='button-primary u-full-width'>
-							Search
-						</button>
 					</div>
 					{/* <div className='sortby'>
 						<select
@@ -172,12 +186,14 @@ var LikersFeed = React.createClass({
 						</select>
 					</div> */}
 				</section>
-				<section className='post-feed'>
-					{ likers }
-					{ this.state.isLoading ? <Spinner/> : '' }
-					<hr />
-					<Waypoint onEnter={ this.loadMoarLikers }/>
-				</section>
+				<Grid>
+					<Row className="show-grid">
+						{ likers }
+						{ this.state.isLoading ? <Spinner/> : '' }
+						<hr />
+						<Waypoint onEnter={ this.loadMoarLikers }/>
+					</Row>
+				</Grid>
 
 			</div>
 		);

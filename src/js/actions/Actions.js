@@ -5,9 +5,10 @@ var Reflux = require('reflux');
   // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
 
 module.exports = Reflux.createActions([
-  "getLikers",
-  "setSortBy",
-  "loadLikersFromPhotoUrl",
-  "setFilterBy",
-  "loadMoarLikers"
+  'getLikers',
+  'setSortBy',
+  'loadLikersFromPhotoUrl',
+  'setFilterBy',
+  'setCityFilterBy',
+  'loadMoarLikers'
 ]);
