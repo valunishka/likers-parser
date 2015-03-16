@@ -31,6 +31,7 @@
     "reflux": "~0.2.5",
     "url": "~0.10.3",
     "superagent": "~0.21.x",
+    "moment": "~2.8.4",
     "underscore": "^1.8.1"
   }
 }
