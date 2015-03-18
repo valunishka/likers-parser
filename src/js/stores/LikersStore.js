@@ -4,6 +4,8 @@ var Reflux = require('reflux');
 var actions = require('../actions/Actions');
 var vkapi = require('../services/vkapi');
 var _ = require('underscore');
+var Firebase = require('firebase');
+var latestSearchesRef = new Firebase('https://liker-finder.firebaseio.com/latestSearches');
 
 var cities = require('../services/cities');
 
@@ -24,6 +26,7 @@ var LikersStore = Reflux.createStore({
 			offset: 0,
 			isLoaded: false,
 			isLoading: false,
+			latestSearches: [],
 			filterOptions: {
 				currentValue: 'All',
 				cityFilter: null,
@@ -81,7 +84,7 @@ var LikersStore = Reflux.createStore({
 
 
 		settings.url = url;
-		settings.isLoaded = true;
+		settings.isLoading = true;
 		console.log("Load likers from photo url");
 		// this.trigger( this._getThisData() );
 

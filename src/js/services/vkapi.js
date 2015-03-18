@@ -1,15 +1,7 @@
-var request = require('superagent');
-var nodeUrl = require('url');
 var _ = require('underscore');
 var citiesService = require('./cities');
 
-var urlFormatOptions = {
-	protocol: 'https',
-	domain: 'vk.com'
-};
-
 var likedCount = 0;
-
 
 	// _getLikersInfoUrl: function( photoInfo ) {
 	// 	return nodeUrl.format(_.extend( urlFormatOptions, {
@@ -35,6 +27,46 @@ var _getPhotoInfo = function( photoUrl ) {
 	});
 };
 
+var _executeGetLikers = function ( photoInfo, params ) {
+	var itemsPerPage = 5000;
+	var query = {
+		owner_id : photoInfo.owner_id,
+		item_id : photoInfo.id,
+		itemsToLoad: itemsPerPage,
+		offset: params && params.offset || 0,
+		v : 5.28
+	},
+	likers = [];
+
+	return new Promise(function( resolve, reject ) {
+
+		var getLikes = function( offset ) {
+
+			VK.Api.call('execute.getLikes', query, function( response ){
+				likers = likers.concat( response.response );
+
+				if ( likers.length < likedCount ){
+					if ( likedCount - likers.length < itemsPerPage ){
+						itemsPerPage = likedCount - likers.length;
+					}
+					setTimeout(function() {
+						getLikes( query.offset++ );
+					}, 500);
+				} else if ( likers.length >= likedCount ) {
+					_.filter( likers, function( liker ) {
+						return liker.sex === 2;
+					});
+					resolve( likers );
+				}
+			});
+		};
+
+		getLikes();
+	});
+
+
+};
+
 var _getLikedUsers = function( photoInfo, params ) {
 
 	return new Promise(function( resolve ) {
@@ -50,7 +82,7 @@ var _getLikedUsers = function( photoInfo, params ) {
 			response = response.response;
 			console.log('MEssage', response);
 			if ( likedCount === 0 ) likedCount = response.count;
-			resolve( response.users );
+			resolve( photoInfo );
 		});
 	});
 };
@@ -76,7 +108,7 @@ var _updateCitiesInfo = function( users ) {
 };
 
 var _extractCityIds = function( users ) {
-	return _.map(users, (user) => { return user.city });
+	return _.map(users, function( user ) { return user.city });
 };
 
 var loadLikersFromPhotoUrl = function( photoUrl ) {
@@ -86,9 +118,11 @@ var loadLikersFromPhotoUrl = function( photoUrl ) {
 
 		_getPhotoInfo( photoUrl )
 			.then( _getLikedUsers )
+			.then( _executeGetLikers )
 			.then( _getUsersInfo )
 			.then(function( response ) {
-				_updateCitiesInfo( _extractCityIds( response ) ).then(function() { resolve( response ) });
+				_updateCitiesInfo( _extractCityIds( response ) )
+					.then(function() { resolve( response ) });
 			});
 	});
 };

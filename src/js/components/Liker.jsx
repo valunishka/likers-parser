@@ -17,12 +17,14 @@ var Liker = React.createClass({
 	],
 
 	render: function() {
-		var liker = this.props.liker,
-			userAge = this.timeAgo(liker.bighday);
+		var liker = this.props.liker;
+		var likerAge = liker.bdate;
+		var hasYear = likerAge ? !!likerAge.match(/\d{4}/) : false;
 
 		if (
 			( this.props.filterBy !== 'All' && liker.sex !== this.props.filterBy ) ||
-			( this.props.cityFilter && this.props.cityFilter !== cities.getCityNameById( liker.city ).toLowerCase() ) ) {
+			( this.props.cityFilter && this.props.cityFilter !== cities.getCityNameById( liker.city ).toLowerCase() ) ||
+				this.props.ageFilter && this.props.ageFilter === 18 ) {
 
 			return null;
 		}
@@ -34,6 +36,7 @@ var Liker = React.createClass({
 				</div>
 				<div className=''>
 					<a href={ 'https://vk.com/id' + liker.uid }>{ liker['first_name'] }</a>
+					<span> { liker.bdate }</span>
 				</div>
 			</Col>
 		);

@@ -15,6 +15,9 @@ var Input = require('react-bootstrap/lib/Input');
 var Button = require('react-bootstrap/lib/Button');
 var Grid = require('react-bootstrap/lib/Grid');
 var Row = require('react-bootstrap/lib/Row');
+var ProgressBar = require('react-bootstrap/lib/ProgressBar');
+var Panel = require('react-bootstrap/lib/Panel');
+
 
 var LikersFeed = React.createClass({
 
@@ -42,7 +45,7 @@ var LikersFeed = React.createClass({
 		// 	this.transitionTo('home');
 		// }
 		this.setState({
-			isLoading: false,
+			isLoading: likersData.isLoading || false,
 			isLoaded: likersData.settings.isLoaded,
 			likers: likersData.likers,
 			sortOptions: likersData.settings.sortOptions,
@@ -106,6 +109,10 @@ var LikersFeed = React.createClass({
 	onNewSearch: function() {
 		var url = this.refs.urlInput.getDOMNode().value;
 
+		this.setState({
+			isLoading: true
+		});
+
 		//TODO match photo id
 		// if (url) url = url.match(/\/([\w\d]+)$/)[1];
 		actions.loadLikersFromPhotoUrl( url || 'https://vk.com/mdk?z=photo-10639516_361350455%2Falbum-10639516_00%2Frev' );
@@ -143,9 +150,19 @@ var LikersFeed = React.createClass({
 			<div className='posts-wrapper container'>
 				<Jumbotron>
 					<h1>Find your destiny</h1>
-					<p>Тут, ты, кароч, можешь найти себе тянку.</p>
+					<p>Тут, ты, кароч, можешь найти себе тянку. Навеяно постом шаристого анона.</p>
+					<quote> короче к делу<br/>
+
+					ПАЛЮ МЕГА СУПЕР ГОДНЫЙ СПОСОБ НАХОДИТЬ ТЯН,КОТОРЫЕ В ПОИСКАХ ПАРНЯ/СТРАДАЮТ ХУИСТРАДАНИЕМ НА ПОЧВЕ ОТСУТСТВИЯ ПАРНЯ.<br/>
+
+					Нужно короче,чтобы можно было брать какой-то пост/ картинку,и чтобы происходила сортировка по ней среди тех,кто лайкнул эту запись по городам.Можно еще и по возрасту прикрутить<br/>
+
+					Есть такая тема,как всякие паблики со шкурами постят пикрелейтед и шкуры их лайкают.Но сами понимаете при лайках 3к+ а их на много больше на пабликах типо ИБД(прост пример),да 100 лайков то сидеть,прокликивать шкур и смотреть какая из них с твоего города не очень занимательное занятие(если ты не с ДС-ДС2).<br/>
+					Стандартными средствами макаки дурова такое не предусмотрели.<br/>
+					Анон,все в твоих рука,если ты шаришь в веб ты подаришь этому миру ахуенейший инструмент.<br/>
+					</quote>
 				</Jumbotron>
-				<section className={ 'post-finder-dashboard row' }>
+				<Panel className={ 'post-finder-dashboard row' }>
 					<Input
 						type={'text'}
 						placeholder='https://vk.com/mdk?z=photo-10639516_361350455%2Falbum-10639516_00%2Frev'
@@ -166,30 +183,11 @@ var LikersFeed = React.createClass({
 						bsStyle="primary" >
 						Filter
 					</Button>
-					<div className='three columns sex-filter-container'>
-						<select
-							className='js-posts-filter-sex-select u-full-width'
-							onChange={ this.updateFilterBy }
-							value={ filterOptions.currentValue }
-							ref='filterBy'>
-							{ filterOptions }
-						</select>
-					</div>
-					{/* <div className='sortby'>
-						<select
-							id='sortby-select'
-							className='sortby-select'
-							onChange={ this.updateSortBy }
-							value={ sortOptions.currentValue }
-							ref='sortBy'>
-							{ options }
-						</select>
-					</div> */}
-				</section>
+				</Panel>
 				<Grid>
 					<Row className="show-grid">
 						{ likers }
-						{ this.state.isLoading ? <Spinner/> : '' }
+						{ this.state.isLoading ? <ProgressBar active now={45} /> : '' }
 						<hr />
 						<Waypoint onEnter={ this.loadMoarLikers }/>
 					</Row>
