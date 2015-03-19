@@ -6,6 +6,7 @@ var vkapi = require('../services/vkapi');
 var _ = require('underscore');
 var Firebase = require('firebase');
 var latestSearchesRef = new Firebase('https://liker-finder.firebaseio.com/latestSearches');
+var SearchesRef = new Firebase('https://liker-finder.firebaseio.com/Searches');
 
 var cities = require('../services/cities');
 
@@ -81,7 +82,7 @@ var LikersStore = Reflux.createStore({
 
 	saveLastestSearchEntity: function( params ) {
 
-		latestSearchesRef.set( params );
+		latestSearchesRef.push( params );
 
 	},
 
@@ -93,6 +94,8 @@ var LikersStore = Reflux.createStore({
 		settings.isLoading = true;
 		console.log("Load likers from photo url");
 		// this.trigger( this._getThisData() );
+
+		SearchesRef.push( url );
 
 		vkapi.loadLikersFromPhotoUrl( url ).then(_.bind(function( res ) {
 
