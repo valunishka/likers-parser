@@ -5292,3 +5292,6 @@ button.close {
 @media print {
   .hidden-print {
     display: none !important; } }
+
+.city-filter-container {
+  margin-top: 10px; }

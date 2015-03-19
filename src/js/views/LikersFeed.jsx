@@ -195,16 +195,18 @@ var LikersFeed = React.createClass({
 						bsStyle={ 'primary' } >
 						Make magic
 					</Button>
-					<Input
-						type={ 'text' }
-						placeholder={ 'Moscow' }
-						label={ 'Фильтрация по городу'}
-						ref={ 'cityFilterInput' } />
-					<Button
-						onClick={ this.updateCityFilterBy }
-						bsStyle="primary" >
-						Filter
-					</Button>
+					<div className='city-filter-container'>
+						<Input
+							type={ 'text' }
+							placeholder={ 'Moscow' }
+							label={ 'Фильтрация по городу'}
+							ref={ 'cityFilterInput' } />
+						<Button
+							onClick={ this.updateCityFilterBy }
+							bsStyle="primary" >
+							Filter
+						</Button>
+					</div>
 				</Panel>
 				<Grid>
 					<Row className="show-grid">
