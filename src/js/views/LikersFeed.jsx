@@ -117,7 +117,7 @@ var LikersFeed = React.createClass({
 	},
 
 	onNewSearch: function() {
-		var url = this.refs.urlInput.getDOMNode().value;
+		var url = this.refs.urlInput.getDOMNode().querySelector('input').value;
 
 		this.setState({
 			isLoading: true

@@ -31401,7 +31401,7 @@ var LikersFeed = React.createClass({ displayName: "LikersFeed",
 	},
 
 	onNewSearch: function onNewSearch() {
-		var url = this.refs.urlInput.getDOMNode().value;
+		var url = this.refs.urlInput.getDOMNode().querySelector("input").value;
 
 		this.setState({
 			isLoading: true
