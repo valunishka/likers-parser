@@ -30925,6 +30925,7 @@ var React = require("react/addons");
 var actions = require("../actions/Actions");
 var Link = require("react-router").Link;
 var cities = require("../services/cities");
+var moment = require("moment");
 
 var Col = require("react-bootstrap/lib/Col");
 
@@ -30956,7 +30957,7 @@ var Liker = React.createClass({ displayName: "Liker",
 
 module.exports = Liker;
 
-},{"../actions/Actions":"/home/bb/www/like_hunt/src/js/actions/Actions.js","../mixins/timeAgo":"/home/bb/www/like_hunt/src/js/mixins/timeAgo.js","../services/cities":"/home/bb/www/like_hunt/src/js/services/cities.js","react-bootstrap/lib/Col":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Col.js","react-router":"/home/bb/www/like_hunt/node_modules/react-router/lib/index.js","react/addons":"/home/bb/www/like_hunt/node_modules/react/addons.js"}],"/home/bb/www/like_hunt/src/js/components/Spinner.jsx":[function(require,module,exports){
+},{"../actions/Actions":"/home/bb/www/like_hunt/src/js/actions/Actions.js","../mixins/timeAgo":"/home/bb/www/like_hunt/src/js/mixins/timeAgo.js","../services/cities":"/home/bb/www/like_hunt/src/js/services/cities.js","moment":"/home/bb/www/like_hunt/node_modules/moment/moment.js","react-bootstrap/lib/Col":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Col.js","react-router":"/home/bb/www/like_hunt/node_modules/react-router/lib/index.js","react/addons":"/home/bb/www/like_hunt/node_modules/react/addons.js"}],"/home/bb/www/like_hunt/src/js/components/Spinner.jsx":[function(require,module,exports){
 "use strict";
 
 var React = require("react");

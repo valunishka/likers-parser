@@ -3,6 +3,7 @@ var React   = require('react/addons');
 var actions = require('../actions/Actions');
 var Link    = require('react-router').Link;
 var cities = require('../services/cities');
+var moment = require('moment');
 
 var Col = require('react-bootstrap/lib/Col');
 
