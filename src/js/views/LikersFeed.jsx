@@ -183,6 +183,7 @@ var LikersFeed = React.createClass({
 					Стандартными средствами макаки дурова такое не предусмотрели.<br/>
 					Анон,все в твоих рука,если ты шаришь в веб ты подаришь этому миру ахуенейший инструмент.<br/>
 					</quote>
+					<p><a href='https://vk.com/mdk?z=photo-10639516_361350455%2Falbum-10639516_00%2Frev'>пример поста хуестраданий</a></p>
 				</Jumbotron>
 				<Panel className={ 'post-finder-dashboard row' }>
 					<Input
