@@ -43,7 +43,11 @@ var _executeGetLikers = function ( photoInfo, params ) {
 		var getLikes = function( offset ) {
 
 			VK.Api.call('execute.getLikes', query, function( response ){
-				likers = likers.concat( response.response );
+
+				response = response.response;
+
+				if ( !response.length ) return resolve( likers );
+				likers = likers.concat( response );
 
 				if ( likers.length < likedCount ){
 					if ( likedCount - likers.length < itemsPerPage ){
@@ -119,10 +123,8 @@ var loadLikersFromPhotoUrl = function( photoUrl ) {
 		_getPhotoInfo( photoUrl )
 			.then( _getLikedUsers )
 			.then( _executeGetLikers )
-			.then( _getUsersInfo )
 			.then(function( response ) {
-				_updateCitiesInfo( _extractCityIds( response ) )
-					.then(function() { resolve( response ) });
+				resolve( response );
 			});
 	});
 };

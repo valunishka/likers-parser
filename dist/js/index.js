@@ -30957,13 +30957,15 @@ var Liker = React.createClass({ displayName: "Liker",
 		var liker = this.props.liker;
 		var likerAge = liker.bdate;
 		var hasYear = likerAge ? !!likerAge.match(/\d{4}/) : false;
+		var filteredByCity = !(!this.props.cityFilter || liker.city && liker.city.title.toLowerCase() === this.props.cityFilter);
+		var filteredByAge = !(this.props.ageFilter && this.props.ageFilter === 18);
 
-		if (this.props.filterBy !== "All" && liker.sex !== this.props.filterBy || this.props.cityFilter && this.props.cityFilter !== cities.getCityNameById(liker.city).toLowerCase() || this.props.ageFilter && this.props.ageFilter === 18) {
+		if (liker.sex !== 1 || filteredByCity) {
 
 			return null;
 		}
 
-		return React.createElement(Col, { xs: 12, md: 3 }, React.createElement("div", { className: "profile-photo-container" }, React.createElement("img", { className: "profile-photo", src: liker.photo_big, alt: "photo" })), React.createElement("div", { className: "" }, React.createElement("a", { href: "https://vk.com/id" + liker.uid }, liker.first_name), React.createElement("span", null, " ", liker.bdate)));
+		return React.createElement(Col, { xs: 12, md: 3 }, React.createElement("div", { className: "profile-photo-container" }, React.createElement("img", { className: "profile-photo", src: liker.photo_200, alt: "photo" })), React.createElement("div", { className: "" }, React.createElement("a", { href: "https://vk.com/id" + liker.uid }, liker.first_name), React.createElement("span", null, " ", liker.bdate)));
 	}
 
 });
@@ -31096,7 +31098,11 @@ var _executeGetLikers = function _executeGetLikers(photoInfo, params) {
 		})(function (offset) {
 
 			VK.Api.call("execute.getLikes", query, function (response) {
-				likers = likers.concat(response.response);
+
+				response = response.response;
+
+				if (!response.length) return resolve(likers);
+				likers = likers.concat(response);
 
 				if (likers.length < likedCount) {
 					if (likedCount - likers.length < itemsPerPage) {
@@ -31168,10 +31174,8 @@ var loadLikersFromPhotoUrl = function loadLikersFromPhotoUrl(photoUrl) {
 	return new Promise(function (resolve) {
 		var likeCounts = 0;
 
-		_getPhotoInfo(photoUrl).then(_getLikedUsers).then(_executeGetLikers).then(_getUsersInfo).then(function (response) {
-			_updateCitiesInfo(_extractCityIds(response)).then(function () {
-				resolve(response);
-			});
+		_getPhotoInfo(photoUrl).then(_getLikedUsers).then(_executeGetLikers).then(function (response) {
+			resolve(response);
 		});
 	});
 };
@@ -31200,7 +31204,7 @@ var LikersStore = Reflux.createStore({
 
 	init: function init() {
 
-		this.likers = {};
+		this.likers = [];
 
 		this.settings = {
 			currentPage: 1,
@@ -31256,9 +31260,14 @@ var LikersStore = Reflux.createStore({
 	_getThisData: function _getThisData() {
 
 		return {
-			likers: this.likers || {},
+			likers: this.likers || [],
 			settings: this.settings
 		};
+	},
+
+	saveLastestSearchEntity: function saveLastestSearchEntity(params) {
+
+		latestSearchesRef.set(params);
 	},
 
 	loadLikersFromPhotoUrl: function loadLikersFromPhotoUrl() {
@@ -31272,6 +31281,12 @@ var LikersStore = Reflux.createStore({
 		// this.trigger( this._getThisData() );
 
 		vkapi.loadLikersFromPhotoUrl(url).then(_.bind(function (res) {
+
+			this.saveLastestSearchEntity({
+				url: url,
+				results: res.length
+			});
+
 			this.likers = res;
 			this.trigger({
 				likers: res,
@@ -31305,6 +31320,8 @@ var Row = require("react-bootstrap/lib/Row");
 var ProgressBar = require("react-bootstrap/lib/ProgressBar");
 var Panel = require("react-bootstrap/lib/Panel");
 
+var paginationOffset = 20;
+
 var LikersFeed = React.createClass({ displayName: "LikersFeed",
 
 	mixins: [Router.Navigation, Reflux.listenTo(likersStore, "onStoreUpdate")],
@@ -31314,7 +31331,8 @@ var LikersFeed = React.createClass({ displayName: "LikersFeed",
 		return {
 			isLoading: false,
 			isloaded: false,
-			likers: likersData.likers,
+			likers: likersData.likers || [],
+			countRenderedLikers: 0,
 			sortOptions: likersData.settings.sortOptions,
 			filterOptions: likersData.settings.filterOptions,
 			nextPage: likersData.settings.nextPage,
@@ -31377,14 +31395,22 @@ var LikersFeed = React.createClass({ displayName: "LikersFeed",
 	updateCityFilterBy: function updateCityFilterBy(event) {
 		event.preventDefault();
 
+		this.setState({
+			isLoading: true
+		});
+
 		actions.setCityFilterBy(this.refs.cityFilterInput.getDOMNode().querySelector("input").value);
 	},
 
 	loadMoarLikes: function loadMoarLikes() {
-		if (this.state.isLoaded) {
-			this.setState({ isLoading: true });
-			actions.loadMoarLikes();
-		}
+		// if (this.state.isLoaded) {
+		// 	this.setState({ isLoading: true });
+		// 	actions.loadMoarLikes();
+		// }
+
+		this.setState({
+			countRenderedLikers: this.state.countRenderedLikers + paginationOffset
+		});
 	},
 
 	onNewSearch: function onNewSearch() {
@@ -31399,9 +31425,21 @@ var LikersFeed = React.createClass({ displayName: "LikersFeed",
 		actions.loadLikersFromPhotoUrl(url || "https://vk.com/mdk?z=photo-10639516_361350455%2Falbum-10639516_00%2Frev");
 	},
 
+	getLikersToRender: function getLikersToRender(likers) {
+		var result = likers.slice(this.state.countRenderedLikers, paginationOffset);
+		return result;
+	},
+
+	getMoarLikersToRender: function getMoarLikersToRender(likers) {
+		this.setState({
+			countRenderedLikers: this.state.countRenderedLikers + paginationOffset
+		});
+	},
+
 	render: function render() {
 		var likers = this.state.likers,
 		    currentPage = this.state.currentPage || 1,
+		    countRenderedLikers = this.state.countRenderedLikers,
 		    sortOptions = this.state.sortOptions,
 		    filterOptions = this.state.filterOptions,
 		    cityFilter = this.state.filterOptions.cityFilter,
@@ -31437,7 +31475,7 @@ var LikersFeed = React.createClass({ displayName: "LikersFeed",
 			label: "Фильтрация по городу",
 			ref: "cityFilterInput" }), React.createElement(Button, {
 			onClick: this.updateCityFilterBy,
-			bsStyle: "primary" }, "Filter")), React.createElement(Grid, null, React.createElement(Row, { className: "show-grid" }, likers, this.state.isLoading ? React.createElement(ProgressBar, { active: true, now: 45 }) : "", React.createElement("hr", null), React.createElement(Waypoint, { onEnter: this.loadMoarLikers }))));
+			bsStyle: "primary" }, "Filter")), React.createElement(Grid, null, React.createElement(Row, { className: "show-grid" }, this.state.isLoading ? "" : { likers: likers }, this.state.isLoading ? React.createElement(ProgressBar, { active: true, now: 45 }) : "", React.createElement("hr", null), React.createElement(Waypoint, { onEnter: this.getMoarLikersToRender }))));
 	}
 
 });

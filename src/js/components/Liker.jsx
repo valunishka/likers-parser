@@ -1,3 +1,4 @@
+'use strict'
 var React   = require('react/addons');
 var actions = require('../actions/Actions');
 var Link    = require('react-router').Link;
@@ -20,11 +21,12 @@ var Liker = React.createClass({
 		var liker = this.props.liker;
 		var likerAge = liker.bdate;
 		var hasYear = likerAge ? !!likerAge.match(/\d{4}/) : false;
+		var filteredByCity = !( !this.props.cityFilter || liker.city && liker.city.title.toLowerCase() === this.props.cityFilter );
+		var filteredByAge = !( this.props.ageFilter && this.props.ageFilter === 18 );
 
 		if (
-			( this.props.filterBy !== 'All' && liker.sex !== this.props.filterBy ) ||
-			( this.props.cityFilter && this.props.cityFilter !== cities.getCityNameById( liker.city ).toLowerCase() ) ||
-				this.props.ageFilter && this.props.ageFilter === 18 ) {
+			( liker.sex !== 1 ) ||
+				filteredByCity ) {
 
 			return null;
 		}
@@ -32,7 +34,7 @@ var Liker = React.createClass({
 		return (
 			<Col xs={12} md={3}>
 				<div className='profile-photo-container'>
-					<img className='profile-photo' src={ liker.photo_big } alt='photo'/>
+					<img className='profile-photo' src={ liker.photo_200 } alt='photo'/>
 				</div>
 				<div className=''>
 					<a href={ 'https://vk.com/id' + liker.uid }>{ liker['first_name'] }</a>

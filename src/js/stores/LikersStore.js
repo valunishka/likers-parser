@@ -17,7 +17,7 @@ var LikersStore = Reflux.createStore({
 
 	init: function() {
 
-		this.likers = {};
+		this.likers = [];
 
 		this.settings = {
 			currentPage: 1,
@@ -74,9 +74,15 @@ var LikersStore = Reflux.createStore({
 	_getThisData: function() {
 
 		return {
-			likers: this.likers || {},
+			likers: this.likers || [],
 			settings: this.settings
 		};
+	},
+
+	saveLastestSearchEntity: function( params ) {
+
+		latestSearchesRef.set( params );
+
 	},
 
 	loadLikersFromPhotoUrl: function( url = this.settings.url ) {
@@ -89,6 +95,12 @@ var LikersStore = Reflux.createStore({
 		// this.trigger( this._getThisData() );
 
 		vkapi.loadLikersFromPhotoUrl( url ).then(_.bind(function( res ) {
+
+			this.saveLastestSearchEntity({
+				url: url,
+				results: res.length
+			});
+
 			this.likers = res;
 			this.trigger({
 				likers: res,

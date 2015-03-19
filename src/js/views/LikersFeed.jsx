@@ -18,6 +18,7 @@ var Row = require('react-bootstrap/lib/Row');
 var ProgressBar = require('react-bootstrap/lib/ProgressBar');
 var Panel = require('react-bootstrap/lib/Panel');
 
+var paginationOffset = 20;
 
 var LikersFeed = React.createClass({
 
@@ -31,7 +32,8 @@ var LikersFeed = React.createClass({
 		return {
 			isLoading: false,
 			isloaded: false,
-			likers: likersData.likers,
+			likers: likersData.likers || [],
+			countRenderedLikers: 0,
 			sortOptions: likersData.settings.sortOptions,
 			filterOptions: likersData.settings.filterOptions,
 			nextPage: likersData.settings.nextPage,
@@ -95,15 +97,23 @@ var LikersFeed = React.createClass({
 	updateCityFilterBy: function( event ) {
 		event.preventDefault();
 
+		this.setState({
+			isLoading: true
+		});
+
 		actions.setCityFilterBy( this.refs.cityFilterInput.getDOMNode().querySelector('input').value );
 
 	},
 
 	loadMoarLikes: function() {
-		if (this.state.isLoaded) {
-			this.setState({ isLoading: true });
-			actions.loadMoarLikes();
-		}
+		// if (this.state.isLoaded) {
+		// 	this.setState({ isLoading: true });
+		// 	actions.loadMoarLikes();
+		// }
+
+		this.setState({
+			countRenderedLikers: this.state.countRenderedLikers + paginationOffset
+		});
 	},
 
 	onNewSearch: function() {
@@ -118,9 +128,21 @@ var LikersFeed = React.createClass({
 		actions.loadLikersFromPhotoUrl( url || 'https://vk.com/mdk?z=photo-10639516_361350455%2Falbum-10639516_00%2Frev' );
 	},
 
+	getLikersToRender: function( likers ) {
+		var result = likers.slice( this.state.countRenderedLikers, paginationOffset );
+		return result;
+	},
+
+	getMoarLikersToRender: function( likers ) {
+		this.setState({
+			countRenderedLikers: this.state.countRenderedLikers + paginationOffset
+		});
+	},
+
 	render: function() {
 		var likers = this.state.likers,
 			currentPage = this.state.currentPage || 1,
+			countRenderedLikers = this.state.countRenderedLikers,
 			sortOptions = this.state.sortOptions,
 			filterOptions = this.state.filterOptions,
 			cityFilter = this.state.filterOptions.cityFilter,
@@ -186,10 +208,10 @@ var LikersFeed = React.createClass({
 				</Panel>
 				<Grid>
 					<Row className="show-grid">
-						{ likers }
+						{ this.state.isLoading ? '' : { likers } }
 						{ this.state.isLoading ? <ProgressBar active now={45} /> : '' }
 						<hr />
-						<Waypoint onEnter={ this.loadMoarLikers }/>
+						<Waypoint onEnter={ this.getMoarLikersToRender }/>
 					</Row>
 				</Grid>
 
