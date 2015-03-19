@@ -31121,7 +31121,6 @@ var _getLikedUsers = function _getLikedUsers(photoInfo, params) {
 
 		VK.Api.call("likes.getList", query, function (response) {
 			response = response.response;
-			console.log("MEssage", response);
 			if (likedCount === 0) likedCount = response.count;
 			resolve(photoInfo);
 		});
