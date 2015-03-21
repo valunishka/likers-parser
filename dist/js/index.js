@@ -3603,7 +3603,78 @@ var CollapsableMixin = {
 
 module.exports = CollapsableMixin;
 
-},{"./utils/TransitionEvents":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/utils/TransitionEvents.js","react":"/home/bb/www/like_hunt/node_modules/react/react.js"}],"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Grid.js":[function(require,module,exports){
+},{"./utils/TransitionEvents":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/utils/TransitionEvents.js","react":"/home/bb/www/like_hunt/node_modules/react/react.js"}],"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/FadeMixin.js":[function(require,module,exports){
+/*global document */
+// TODO: listen for onTransitionEnd to remove el
+function getElementsAndSelf (root, classes){
+  var els = root.querySelectorAll('.' + classes.join('.'));
+
+  els = [].map.call(els, function(e){ return e; });
+
+  for(var i = 0; i < classes.length; i++){
+    if( !root.className.match(new RegExp('\\b' +  classes[i] + '\\b'))){
+      return els;
+    }
+  }
+  els.unshift(root);
+  return els;
+}
+
+module.exports = {
+  _fadeIn: function () {
+    var els;
+
+    if (this.isMounted()) {
+      els = getElementsAndSelf(this.getDOMNode(), ['fade']);
+
+      if (els.length) {
+        els.forEach(function (el) {
+          el.className += ' in';
+        });
+      }
+    }
+  },
+
+  _fadeOut: function () {
+    var els = getElementsAndSelf(this._fadeOutEl, ['fade', 'in']);
+
+    if (els.length) {
+      els.forEach(function (el) {
+        el.className = el.className.replace(/\bin\b/, '');
+      });
+    }
+
+    setTimeout(this._handleFadeOutEnd, 300);
+  },
+
+  _handleFadeOutEnd: function () {
+    if (this._fadeOutEl && this._fadeOutEl.parentNode) {
+      this._fadeOutEl.parentNode.removeChild(this._fadeOutEl);
+    }
+  },
+
+  componentDidMount: function () {
+    if (document.querySelectorAll) {
+      // Firefox needs delay for transition to be triggered
+      setTimeout(this._fadeIn, 20);
+    }
+  },
+
+  componentWillUnmount: function () {
+    var els = getElementsAndSelf(this.getDOMNode(), ['fade']),
+        container = (this.props.container && this.props.container.getDOMNode()) || document.body;
+
+    if (els.length) {
+      this._fadeOutEl = document.createElement('div');
+      container.appendChild(this._fadeOutEl);
+      this._fadeOutEl.appendChild(this.getDOMNode().cloneNode(true));
+      // Firefox needs delay for transition to be triggered
+      setTimeout(this._fadeOut, 20);
+    }
+  }
+};
+
+},{}],"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Grid.js":[function(require,module,exports){
 var React = require('react');
 var joinClasses = require('./utils/joinClasses');
 
@@ -4000,7 +4071,180 @@ var Jumbotron = React.createClass({displayName: "Jumbotron",
 });
 
 module.exports = Jumbotron;
-},{"./utils/joinClasses":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/utils/joinClasses.js","react":"/home/bb/www/like_hunt/node_modules/react/react.js"}],"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Panel.js":[function(require,module,exports){
+},{"./utils/joinClasses":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/utils/joinClasses.js","react":"/home/bb/www/like_hunt/node_modules/react/react.js"}],"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Modal.js":[function(require,module,exports){
+/* global document:false */
+
+var React = require('react');
+var joinClasses = require('./utils/joinClasses');
+var classSet = require('./utils/classSet');
+var BootstrapMixin = require('./BootstrapMixin');
+var FadeMixin = require('./FadeMixin');
+var EventListener = require('./utils/EventListener');
+
+
+// TODO:
+// - aria-labelledby
+// - Add `modal-body` div if only one child passed in that doesn't already have it
+// - Tests
+
+var Modal = React.createClass({displayName: "Modal",
+  mixins: [BootstrapMixin, FadeMixin],
+
+  propTypes: {
+    title: React.PropTypes.node,
+    backdrop: React.PropTypes.oneOf(['static', true, false]),
+    keyboard: React.PropTypes.bool,
+    closeButton: React.PropTypes.bool,
+    animation: React.PropTypes.bool,
+    onRequestHide: React.PropTypes.func.isRequired
+  },
+
+  getDefaultProps: function () {
+    return {
+      bsClass: 'modal',
+      backdrop: true,
+      keyboard: true,
+      animation: true,
+      closeButton: true
+    };
+  },
+
+  render: function () {
+    var modalStyle = {display: 'block'};
+    var dialogClasses = this.getBsClassSet();
+    delete dialogClasses.modal;
+    dialogClasses['modal-dialog'] = true;
+
+    var classes = {
+      modal: true,
+      fade: this.props.animation,
+      'in': !this.props.animation || !document.querySelectorAll
+    };
+
+    var modal = (
+      React.createElement("div", React.__spread({}, 
+        this.props, 
+        {title: null, 
+        tabIndex: "-1", 
+        role: "dialog", 
+        style: modalStyle, 
+        className: joinClasses(this.props.className, classSet(classes)), 
+        onClick: this.props.backdrop === true ? this.handleBackdropClick : null, 
+        ref: "modal"}), 
+        React.createElement("div", {className: classSet(dialogClasses)}, 
+          React.createElement("div", {className: "modal-content", style: {overflow: 'hidden'}}, 
+            this.props.title ? this.renderHeader() : null, 
+            this.props.children
+          )
+        )
+      )
+    );
+
+    return this.props.backdrop ?
+      this.renderBackdrop(modal) : modal;
+  },
+
+  renderBackdrop: function (modal) {
+    var classes = {
+      'modal-backdrop': true,
+      'fade': this.props.animation
+    };
+
+    classes['in'] = !this.props.animation || !document.querySelectorAll;
+
+    var onClick = this.props.backdrop === true ?
+      this.handleBackdropClick : null;
+
+    return (
+      React.createElement("div", null, 
+        React.createElement("div", {className: classSet(classes), ref: "backdrop", onClick: onClick}), 
+        modal
+      )
+    );
+  },
+
+  renderHeader: function () {
+    var closeButton;
+    if (this.props.closeButton) {
+      closeButton = (
+          React.createElement("button", {type: "button", className: "close", "aria-hidden": "true", onClick: this.props.onRequestHide}, "×")
+        );
+    }
+
+    var style = this.props.bsStyle;
+    var classes = {
+      'modal-header': true
+    };
+    classes['bg-' + style] = style;
+    classes['text-' + style] = style;
+
+    var className = classSet(classes);
+
+    return (
+      React.createElement("div", {className: className}, 
+        closeButton, 
+        this.renderTitle()
+      )
+    );
+  },
+
+  renderTitle: function () {
+    return (
+      React.isValidElement(this.props.title) ?
+        this.props.title : React.createElement("h4", {className: "modal-title"}, this.props.title)
+    );
+  },
+
+  iosClickHack: function () {
+    // IOS only allows click events to be delegated to the document on elements
+    // it considers 'clickable' - anchors, buttons, etc. We fake a click handler on the
+    // DOM nodes themselves. Remove if handled by React: https://github.com/facebook/react/issues/1169
+    this.refs.modal.getDOMNode().onclick = function () {};
+    this.refs.backdrop.getDOMNode().onclick = function () {};
+  },
+
+  componentDidMount: function () {
+    this._onDocumentKeyupListener =
+      EventListener.listen(document, 'keyup', this.handleDocumentKeyUp);
+
+    var container = (this.props.container && this.props.container.getDOMNode()) || document.body;
+    container.className += container.className.length ? ' modal-open' : 'modal-open';
+
+    if (this.props.backdrop) {
+      this.iosClickHack();
+    }
+  },
+
+  componentDidUpdate: function (prevProps) {
+    if (this.props.backdrop && this.props.backdrop !== prevProps.backdrop) {
+      this.iosClickHack();
+    }
+  },
+
+  componentWillUnmount: function () {
+    this._onDocumentKeyupListener.remove();
+    var container = (this.props.container && this.props.container.getDOMNode()) || document.body;
+    container.className = container.className.replace(/ ?modal-open/, '');
+  },
+
+  handleBackdropClick: function (e) {
+    if (e.target !== e.currentTarget) {
+      return;
+    }
+
+    this.props.onRequestHide();
+  },
+
+  handleDocumentKeyUp: function (e) {
+    if (this.props.keyboard && e.keyCode === 27) {
+      this.props.onRequestHide();
+    }
+  }
+});
+
+module.exports = Modal;
+
+},{"./BootstrapMixin":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/BootstrapMixin.js","./FadeMixin":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/FadeMixin.js","./utils/EventListener":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/utils/EventListener.js","./utils/classSet":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/utils/classSet.js","./utils/joinClasses":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/utils/joinClasses.js","react":"/home/bb/www/like_hunt/node_modules/react/react.js"}],"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Panel.js":[function(require,module,exports){
 var React = require('react');
 var joinClasses = require('./utils/joinClasses');
 var classSet = require('./utils/classSet');
@@ -4664,6 +4908,62 @@ module.exports = {
     'menu-up'
   ]
 };
+
+},{}],"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/utils/EventListener.js":[function(require,module,exports){
+/**
+ * Copyright 2013-2014 Facebook, Inc.
+ *
+ * This file contains a modified version of:
+ * https://github.com/facebook/react/blob/v0.12.0/src/vendor/stubs/EventListener.js
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * TODO: remove in favour of solution provided by:
+ *  https://github.com/facebook/react/issues/285
+ */
+
+/**
+ * Does not take into account specific nature of platform.
+ */
+var EventListener = {
+  /**
+   * Listen to DOM events during the bubble phase.
+   *
+   * @param {DOMEventTarget} target DOM element to register listener on.
+   * @param {string} eventType Event type, e.g. 'click' or 'mouseover'.
+   * @param {function} callback Callback function.
+   * @return {object} Object with a `remove` method.
+   */
+  listen: function(target, eventType, callback) {
+    if (target.addEventListener) {
+      target.addEventListener(eventType, callback, false);
+      return {
+        remove: function() {
+          target.removeEventListener(eventType, callback, false);
+        }
+      };
+    } else if (target.attachEvent) {
+      target.attachEvent('on' + eventType, callback);
+      return {
+        remove: function() {
+          target.detachEvent('on' + eventType, callback);
+        }
+      };
+    }
+  }
+};
+
+module.exports = EventListener;
 
 },{}],"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/utils/Object.assign.js":[function(require,module,exports){
 /**
@@ -31306,6 +31606,7 @@ var Grid = require("react-bootstrap/lib/Grid");
 var Row = require("react-bootstrap/lib/Row");
 var ProgressBar = require("react-bootstrap/lib/ProgressBar");
 var Panel = require("react-bootstrap/lib/Panel");
+var Modal = require("react-bootstrap/lib/Modal");
 
 var paginationOffset = 20;
 
@@ -31335,6 +31636,7 @@ var LikersFeed = React.createClass({ displayName: "LikersFeed",
 		this.setState({
 			isLoading: likersData.isLoading || false,
 			isLoaded: likersData.settings.isLoaded,
+			authAgree: false,
 			likers: likersData.likers,
 			sortOptions: likersData.settings.sortOptions,
 			filterOptions: likersData.settings.filterOptions,
@@ -31423,6 +31725,16 @@ var LikersFeed = React.createClass({ displayName: "LikersFeed",
 		});
 	},
 
+	onAuthAgree: function onAuthAgree() {
+		this.setState({
+			authAgree: true
+		});
+		VK.init({
+			apiId: 4830522
+		});
+		VK.Auth.login();
+	},
+
 	render: function render() {
 		var likers = this.state.likers,
 		    currentPage = this.state.currentPage || 1,
@@ -31462,11 +31774,15 @@ var LikersFeed = React.createClass({ displayName: "LikersFeed",
 			label: "Фильтрация по городу",
 			ref: "cityFilterInput" }), React.createElement(Button, {
 			onClick: this.updateCityFilterBy,
-			bsStyle: "primary" }, "Filter"))), React.createElement(Grid, null, React.createElement(Row, { className: "show-grid" }, this.state.isLoading ? "" : { likers: likers }, this.state.isLoading ? React.createElement(ProgressBar, { active: true, now: 45 }) : "", React.createElement("hr", null), React.createElement(Waypoint, { onEnter: this.getMoarLikersToRender }))));
+			bsStyle: "primary" }, "Filter"))), React.createElement(Grid, null, React.createElement(Row, { className: "show-grid" }, this.state.isLoading ? "" : { likers: likers }, this.state.isLoading ? React.createElement(ProgressBar, { active: true, now: 45 }) : "", React.createElement("hr", null), React.createElement(Waypoint, { onEnter: this.getMoarLikersToRender }))), !this.state.authAgree ? React.createElement("div", { className: "static-modal" }, React.createElement(Modal, { title: "Информация для параноиков",
+			bsStyle: "primary",
+			backdrop: false,
+			animation: false,
+			onRequestHide: this.handleHideModal }, React.createElement("div", { className: "modal-body" }, "Приложение использует ", React.createElement("a", { href: "https://vk.com/pages?oid=-1&p=photos.getById" }, "метод "), "api вконтакта требующий авторизации"), React.createElement("div", { className: "modal-footer" }, React.createElement(Button, { onClick: this.onAuthAgree }, "Ok")))) : "");
 	}
 
 });
 
 module.exports = LikersFeed;
 
-},{"../actions/Actions":"/home/bb/www/like_hunt/src/js/actions/Actions.js","../components/Liker.jsx":"/home/bb/www/like_hunt/src/js/components/Liker.jsx","../components/Spinner.jsx":"/home/bb/www/like_hunt/src/js/components/Spinner.jsx","../stores/LikersStore":"/home/bb/www/like_hunt/src/js/stores/LikersStore.js","react-bootstrap/lib/Button":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Button.js","react-bootstrap/lib/Grid":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Grid.js","react-bootstrap/lib/Input":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Input.js","react-bootstrap/lib/Jumbotron":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Jumbotron.js","react-bootstrap/lib/Panel":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Panel.js","react-bootstrap/lib/ProgressBar":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/ProgressBar.js","react-bootstrap/lib/Row":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Row.js","react-router":"/home/bb/www/like_hunt/node_modules/react-router/lib/index.js","react-waypoint":"/home/bb/www/like_hunt/node_modules/react-waypoint/index.js","react/addons":"/home/bb/www/like_hunt/node_modules/react/addons.js","reflux":"/home/bb/www/like_hunt/node_modules/reflux/index.js","underscore":"/home/bb/www/like_hunt/node_modules/underscore/underscore.js"}]},{},["./src/js/index.jsx"]);
+},{"../actions/Actions":"/home/bb/www/like_hunt/src/js/actions/Actions.js","../components/Liker.jsx":"/home/bb/www/like_hunt/src/js/components/Liker.jsx","../components/Spinner.jsx":"/home/bb/www/like_hunt/src/js/components/Spinner.jsx","../stores/LikersStore":"/home/bb/www/like_hunt/src/js/stores/LikersStore.js","react-bootstrap/lib/Button":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Button.js","react-bootstrap/lib/Grid":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Grid.js","react-bootstrap/lib/Input":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Input.js","react-bootstrap/lib/Jumbotron":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Jumbotron.js","react-bootstrap/lib/Modal":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Modal.js","react-bootstrap/lib/Panel":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Panel.js","react-bootstrap/lib/ProgressBar":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/ProgressBar.js","react-bootstrap/lib/Row":"/home/bb/www/like_hunt/node_modules/react-bootstrap/lib/Row.js","react-router":"/home/bb/www/like_hunt/node_modules/react-router/lib/index.js","react-waypoint":"/home/bb/www/like_hunt/node_modules/react-waypoint/index.js","react/addons":"/home/bb/www/like_hunt/node_modules/react/addons.js","reflux":"/home/bb/www/like_hunt/node_modules/reflux/index.js","underscore":"/home/bb/www/like_hunt/node_modules/underscore/underscore.js"}]},{},["./src/js/index.jsx"]);

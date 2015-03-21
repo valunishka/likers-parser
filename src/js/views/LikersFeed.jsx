@@ -17,6 +17,7 @@ var Grid = require('react-bootstrap/lib/Grid');
 var Row = require('react-bootstrap/lib/Row');
 var ProgressBar = require('react-bootstrap/lib/ProgressBar');
 var Panel = require('react-bootstrap/lib/Panel');
+var Modal = require('react-bootstrap/lib/Modal');
 
 var paginationOffset = 20;
 
@@ -49,6 +50,7 @@ var LikersFeed = React.createClass({
 		this.setState({
 			isLoading: likersData.isLoading || false,
 			isLoaded: likersData.settings.isLoaded,
+			authAgree: false,
 			likers: likersData.likers,
 			sortOptions: likersData.settings.sortOptions,
 			filterOptions: likersData.settings.filterOptions,
@@ -139,6 +141,16 @@ var LikersFeed = React.createClass({
 		});
 	},
 
+	onAuthAgree: function() {
+		this.setState({
+			authAgree: true
+		});
+		VK.init({
+			apiId: 4830522
+		});
+		VK.Auth.login();
+	},
+
 	render: function() {
 		var likers = this.state.likers,
 			currentPage = this.state.currentPage || 1,
@@ -185,8 +197,6 @@ var LikersFeed = React.createClass({
 					</quote>
 					<p>
 						<a href='https://vk.com/mdk?z=photo-10639516_361350455%2Falbum-10639516_00%2Frev'>пример поста хуестраданий</a>
-						<br/>
-						<a href='https://vk.com/pages?oid=-1&p=photos.getById'>Почему нужна авторизация вк</a>
 					</p>
 
 				</Jumbotron>
@@ -222,6 +232,26 @@ var LikersFeed = React.createClass({
 						<Waypoint onEnter={ this.getMoarLikersToRender }/>
 					</Row>
 				</Grid>
+
+				{ !this.state.authAgree ?
+					<div className='static-modal'>
+						<Modal title='Информация для параноиков'
+							bsStyle='primary'
+							backdrop={ false }
+							animation={ false }
+							onRequestHide={ this.handleHideModal }>
+							<div className='modal-body'>
+								Приложение использует <a href='https://vk.com/pages?oid=-1&p=photos.getById'>метод </a>
+								api вконтакта требующий авторизации
+							</div>
+							<div className='modal-footer'>
+								<Button onClick={ this.onAuthAgree }>Ok</Button>
+							</div>
+						</Modal>
+					</div>
+					:
+					''
+				}
 
 			</div>
 		);
