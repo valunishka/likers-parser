@@ -38,7 +38,7 @@ var Liker = React.createClass({
 					<img className='profile-photo' src={ liker.photo_200 } alt='photo'/>
 				</div>
 				<div className=''>
-					<a href={ 'https://vk.com/id' + liker.uid }>{ liker['first_name'] }</a>
+					<a href={ 'https://vk.com/id' + liker.id }>{ liker['first_name'] }</a>
 					<span> { liker.bdate }</span>
 				</div>
 			</Col>

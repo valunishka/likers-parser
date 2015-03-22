@@ -90,34 +90,11 @@ var _getLikedUsers = function( photoInfo, params ) {
 	});
 };
 
-var _getUsersInfo = function( users ) {
-
-	return new Promise(function( resolve ) {
-		var query = {
-			uids: users.join(','),
-			fields: 'bdate,sex,photo_big,city'
-		};
-
-		VK.Api.call('users.get', query, function( response ) {
-			response = response.response;
-			resolve( response );
-		});
-
-	});
-};
-
-var _updateCitiesInfo = function( users ) {
-	return citiesService.getCitiesInfo( users );
-};
-
-var _extractCityIds = function( users ) {
-	return _.map(users, function( user ) { return user.city });
-};
 
 var loadLikersFromPhotoUrl = function( photoUrl ) {
 
 	return new Promise(function( resolve ) {
-		var likeCounts = 0;
+		likedCount = 0;
 
 		_getPhotoInfo( photoUrl )
 			.then( _getLikedUsers )

@@ -31250,7 +31250,7 @@ var Liker = React.createClass({ displayName: "Liker",
 			return null;
 		}
 
-		return React.createElement(Col, { xs: 12, md: 3 }, React.createElement("div", { className: "profile-photo-container" }, React.createElement("img", { className: "profile-photo", src: liker.photo_200, alt: "photo" })), React.createElement("div", { className: "" }, React.createElement("a", { href: "https://vk.com/id" + liker.uid }, liker.first_name), React.createElement("span", null, " ", liker.bdate)));
+		return React.createElement(Col, { xs: 12, md: 3 }, React.createElement("div", { className: "profile-photo-container" }, React.createElement("img", { className: "profile-photo", src: liker.photo_200, alt: "photo" })), React.createElement("div", { className: "" }, React.createElement("a", { href: "https://vk.com/id" + liker.id }, liker.first_name), React.createElement("span", null, " ", liker.bdate)));
 	}
 
 });
@@ -31428,35 +31428,10 @@ var _getLikedUsers = function _getLikedUsers(photoInfo, params) {
 	});
 };
 
-var _getUsersInfo = function _getUsersInfo(users) {
-
-	return new Promise(function (resolve) {
-		var query = {
-			uids: users.join(","),
-			fields: "bdate,sex,photo_big,city"
-		};
-
-		VK.Api.call("users.get", query, function (response) {
-			response = response.response;
-			resolve(response);
-		});
-	});
-};
-
-var _updateCitiesInfo = function _updateCitiesInfo(users) {
-	return citiesService.getCitiesInfo(users);
-};
-
-var _extractCityIds = function _extractCityIds(users) {
-	return _.map(users, function (user) {
-		return user.city;
-	});
-};
-
 var loadLikersFromPhotoUrl = function loadLikersFromPhotoUrl(photoUrl) {
 
 	return new Promise(function (resolve) {
-		var likeCounts = 0;
+		likedCount = 0;
 
 		_getPhotoInfo(photoUrl).then(_getLikedUsers).then(_executeGetLikers).then(function (response) {
 			resolve(response);
