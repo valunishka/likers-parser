@@ -33,6 +33,7 @@ var LikersFeed = React.createClass({
 		return {
 			isLoading: false,
 			isloaded: false,
+			onAuthAgree: false,
 			likers: likersData.likers || [],
 			countRenderedLikers: 0,
 			sortOptions: likersData.settings.sortOptions,
@@ -50,7 +51,6 @@ var LikersFeed = React.createClass({
 		this.setState({
 			isLoading: likersData.isLoading || false,
 			isLoaded: likersData.settings.isLoaded,
-			authAgree: false,
 			likers: likersData.likers,
 			sortOptions: likersData.settings.sortOptions,
 			filterOptions: likersData.settings.filterOptions,
@@ -197,6 +197,8 @@ var LikersFeed = React.createClass({
 					</quote>
 					<p>
 						<a href='https://vk.com/mdk?z=photo-10639516_361350455%2Falbum-10639516_00%2Frev'>пример поста хуестраданий</a>
+						<br/>
+						<a href='https://vk.com/pages?oid=-1&p=photos.getById'>Почему нужна авторизация вк</a>
 					</p>
 
 				</Jumbotron>
@@ -233,7 +235,7 @@ var LikersFeed = React.createClass({
 					</Row>
 				</Grid>
 
-				{ !this.state.authAgree ?
+				{ !true ?
 					<div className='static-modal'>
 						<Modal title='Информация для параноиков'
 							bsStyle='primary'

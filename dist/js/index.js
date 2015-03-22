@@ -31619,6 +31619,7 @@ var LikersFeed = React.createClass({ displayName: "LikersFeed",
 		return {
 			isLoading: false,
 			isloaded: false,
+			onAuthAgree: false,
 			likers: likersData.likers || [],
 			countRenderedLikers: 0,
 			sortOptions: likersData.settings.sortOptions,
@@ -31636,7 +31637,6 @@ var LikersFeed = React.createClass({ displayName: "LikersFeed",
 		this.setState({
 			isLoading: likersData.isLoading || false,
 			isLoaded: likersData.settings.isLoaded,
-			authAgree: false,
 			likers: likersData.likers,
 			sortOptions: likersData.settings.sortOptions,
 			filterOptions: likersData.settings.filterOptions,
@@ -31762,7 +31762,7 @@ var LikersFeed = React.createClass({ displayName: "LikersFeed",
 			return React.createElement("option", { value: filterOptions[i], key: i }, text);
 		});
 
-		return React.createElement("div", { className: "posts-wrapper container" }, React.createElement(Jumbotron, null, React.createElement("h1", null, "Find your destiny"), React.createElement("p", null, "Тут, ты, кароч, можешь найти себе тянку. Навеяно постом шаристого анона."), React.createElement("quote", null, " короче к делу", React.createElement("br", null), "ПАЛЮ МЕГА СУПЕР ГОДНЫЙ СПОСОБ НАХОДИТЬ ТЯН,КОТОРЫЕ В ПОИСКАХ ПАРНЯ/СТРАДАЮТ ХУИСТРАДАНИЕМ НА ПОЧВЕ ОТСУТСТВИЯ ПАРНЯ.", React.createElement("br", null), "Нужно короче,чтобы можно было брать какой-то пост/ картинку,и чтобы происходила сортировка по ней среди тех,кто лайкнул эту запись по городам.Можно еще и по возрасту прикрутить", React.createElement("br", null), "Есть такая тема,как всякие паблики со шкурами постят пикрелейтед и шкуры их лайкают.Но сами понимаете при лайках 3к+ а их на много больше на пабликах типо ИБД(прост пример),да 100 лайков то сидеть,прокликивать шкур и смотреть какая из них с твоего города не очень занимательное занятие(если ты не с ДС-ДС2).", React.createElement("br", null), "Стандартными средствами макаки дурова такое не предусмотрели.", React.createElement("br", null), "Анон,все в твоих рука,если ты шаришь в веб ты подаришь этому миру ахуенейший инструмент.", React.createElement("br", null)), React.createElement("p", null, React.createElement("a", { href: "https://vk.com/mdk?z=photo-10639516_361350455%2Falbum-10639516_00%2Frev" }, "пример поста хуестраданий"))), React.createElement(Panel, { className: "post-finder-dashboard row" }, React.createElement(Input, {
+		return React.createElement("div", { className: "posts-wrapper container" }, React.createElement(Jumbotron, null, React.createElement("h1", null, "Find your destiny"), React.createElement("p", null, "Тут, ты, кароч, можешь найти себе тянку. Навеяно постом шаристого анона."), React.createElement("quote", null, " короче к делу", React.createElement("br", null), "ПАЛЮ МЕГА СУПЕР ГОДНЫЙ СПОСОБ НАХОДИТЬ ТЯН,КОТОРЫЕ В ПОИСКАХ ПАРНЯ/СТРАДАЮТ ХУИСТРАДАНИЕМ НА ПОЧВЕ ОТСУТСТВИЯ ПАРНЯ.", React.createElement("br", null), "Нужно короче,чтобы можно было брать какой-то пост/ картинку,и чтобы происходила сортировка по ней среди тех,кто лайкнул эту запись по городам.Можно еще и по возрасту прикрутить", React.createElement("br", null), "Есть такая тема,как всякие паблики со шкурами постят пикрелейтед и шкуры их лайкают.Но сами понимаете при лайках 3к+ а их на много больше на пабликах типо ИБД(прост пример),да 100 лайков то сидеть,прокликивать шкур и смотреть какая из них с твоего города не очень занимательное занятие(если ты не с ДС-ДС2).", React.createElement("br", null), "Стандартными средствами макаки дурова такое не предусмотрели.", React.createElement("br", null), "Анон,все в твоих рука,если ты шаришь в веб ты подаришь этому миру ахуенейший инструмент.", React.createElement("br", null)), React.createElement("p", null, React.createElement("a", { href: "https://vk.com/mdk?z=photo-10639516_361350455%2Falbum-10639516_00%2Frev" }, "пример поста хуестраданий"), React.createElement("br", null), React.createElement("a", { href: "https://vk.com/pages?oid=-1&p=photos.getById" }, "Почему нужна авторизация вк"))), React.createElement(Panel, { className: "post-finder-dashboard row" }, React.createElement(Input, {
 			type: "text",
 			placeholder: "https://vk.com/mdk?z=photo-10639516_361350455%2Falbum-10639516_00%2Frev",
 			label: "Ссылка на пикчу",
@@ -31774,7 +31774,7 @@ var LikersFeed = React.createClass({ displayName: "LikersFeed",
 			label: "Фильтрация по городу",
 			ref: "cityFilterInput" }), React.createElement(Button, {
 			onClick: this.updateCityFilterBy,
-			bsStyle: "primary" }, "Filter"))), React.createElement(Grid, null, React.createElement(Row, { className: "show-grid" }, this.state.isLoading ? "" : { likers: likers }, this.state.isLoading ? React.createElement(ProgressBar, { active: true, now: 45 }) : "", React.createElement("hr", null), React.createElement(Waypoint, { onEnter: this.getMoarLikersToRender }))), !this.state.authAgree ? React.createElement("div", { className: "static-modal" }, React.createElement(Modal, { title: "Информация для параноиков",
+			bsStyle: "primary" }, "Filter"))), React.createElement(Grid, null, React.createElement(Row, { className: "show-grid" }, this.state.isLoading ? "" : { likers: likers }, this.state.isLoading ? React.createElement(ProgressBar, { active: true, now: 45 }) : "", React.createElement("hr", null), React.createElement(Waypoint, { onEnter: this.getMoarLikersToRender }))), !true ? React.createElement("div", { className: "static-modal" }, React.createElement(Modal, { title: "Информация для параноиков",
 			bsStyle: "primary",
 			backdrop: false,
 			animation: false,
