@@ -1,5 +1,4 @@
 var _ = require('underscore');
-var citiesService = require('./cities');
 
 var likedCount = 0;
 
@@ -21,7 +20,7 @@ var likedCount = 0;
 var _getPhotoInfo = function( photoUrl ) {
 	var photoId = photoUrl.match(/photo([\-\d\_]+)/)[1];
 	return new Promise(function( resolve ) {
-		VK.Api.call('photos.getById', { photos : photoId, v : 5.28 }, function( response ) {
+		VK.Api.call('photos.getById', { photos : photoId }, function( response ) {
 			resolve( response.response[0] );
 		});
 	});
@@ -71,7 +70,7 @@ var _executeGetLikers = function ( photoInfo, params ) {
 
 };
 
-var _getLikedUsers = function( photoInfo, params ) {
+var _countLikedUsers = function( photoInfo, params ) {
 
 	return new Promise(function( resolve ) {
 		var query = {
@@ -97,7 +96,7 @@ var loadLikersFromPhotoUrl = function( photoUrl ) {
 		likedCount = 0;
 
 		_getPhotoInfo( photoUrl )
-			.then( _getLikedUsers )
+			.then( _countLikedUsers )
 			.then( _executeGetLikers )
 			.then(function( response ) {
 				resolve( response );

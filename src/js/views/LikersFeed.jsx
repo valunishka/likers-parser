@@ -18,6 +18,7 @@ var Row = require('react-bootstrap/lib/Row');
 var ProgressBar = require('react-bootstrap/lib/ProgressBar');
 var Panel = require('react-bootstrap/lib/Panel');
 var Modal = require('react-bootstrap/lib/Modal');
+var Infinite = require('react-infinity');
 
 var paginationOffset = 20;
 

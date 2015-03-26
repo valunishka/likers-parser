@@ -8,8 +8,6 @@ var Firebase = require('firebase');
 var latestSearchesRef = new Firebase('https://liker-finder.firebaseio.com/latestSearches');
 var SearchesRef = new Firebase('https://liker-finder.firebaseio.com/Searches');
 
-var cities = require('../services/cities');
-
 var LIKERS_PER_PAGE = 50;
 
 var LikersStore = Reflux.createStore({
@@ -58,7 +56,6 @@ var LikersStore = Reflux.createStore({
 
 	setCityFilterBy: function( city ) {
 		this.settings.filterOptions.cityFilter = city.toLowerCase();
-		console.log('Cities', cities.getCitiesInfo());
 		this.trigger(this._getThisData());
 	},
 
@@ -66,7 +63,6 @@ var LikersStore = Reflux.createStore({
 		this.settings.offset += LIKERS_PER_PAGE;
 		this.loadLikersFromPhotoUrl();
 	},
-
 
 	getDefaultData: function() {
 		return this._getThisData();
@@ -81,14 +77,11 @@ var LikersStore = Reflux.createStore({
 	},
 
 	saveLastestSearchEntity: function( params ) {
-
 		latestSearchesRef.push( params );
-
 	},
 
 	loadLikersFromPhotoUrl: function( url = this.settings.url ) {
 		var settings = this.settings;
-
 
 		settings.url = url;
 		settings.isLoading = true;
