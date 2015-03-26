@@ -152,6 +152,11 @@ var LikersFeed = React.createClass({
 		VK.Auth.login();
 	},
 
+	handleKeyPress: function( event ) {
+		console.log(event.type, event.which, event.timeStamp);
+		if ( event.which === 13 ) this.onNewSearch();
+	},
+
 	render: function() {
 		var likers = this.state.likers,
 			currentPage = this.state.currentPage || 1,
@@ -207,6 +212,7 @@ var LikersFeed = React.createClass({
 					<Input
 						type={'text'}
 						placeholder='https://vk.com/mdk?z=photo-10639516_361350455%2Falbum-10639516_00%2Frev'
+						onKeyPress={ this.handleKeyPress }
 						label={ 'Ссылка на пикчу' }
 						ref={ 'urlInput' } />
 					<Button
