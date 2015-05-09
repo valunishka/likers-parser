@@ -1,38 +1,35 @@
-var React = require('react/addons');
-var Reflux  = require('reflux');
+import React from 'react/addons';
+import Reflux from 'reflux';
+import Router from 'react-router';
+import actions from './actions/Actions';
+import LikersFeed from './views/LikersFeed.jsx';
 
-var Router        = require('react-router');
-var RouteHandler  = Router.RouteHandler;
-var Route         = Router.Route;
-// var NotFoundRoute = Router.NotFoundRoute;
-var DefaultRoute  = Router.DefaultRoute;
-var Link          = Router.Link;
+let RouteHandler = Router.RouteHandler;
+let Route = Router.Route;
+// let NotFoundRoute = Router.NotFoundRoute;
+let DefaultRoute = Router.DefaultRoute;
+let Link = Router.Link;
 
-var actions       = require('./actions/Actions');
-var LikersFeed    = require('./views/LikersFeed.jsx');
+let App = React.createClass({
 
-var App = React.createClass({
+  getInitialState() {
+    return {};
+  },
 
-	getInitialState: function() {
-		return {};
-	},
-
-
-	render: function() {
-
-		return (
+	render() {
+    return (
 			<RouteHandler { ...this.props }/>
-		)
+		);
 	}
 });
 
-var routes = (
+let routes = (
 	<Route handler={ App }>
 		<Route name="likers" path="/likers/:pageNum" handler={ LikersFeed } ignoreScrollBehavior />
 		<DefaultRoute name="home" handler={ LikersFeed } />
 	</Route>
 );
 
-Router.run(routes, function(Handler, state) {
+Router.run(routes, (Handler, state) => {
   React.render(<Handler params={ state.params } />, document.querySelector('.js-main-container'));
 });

@@ -1,17 +1,13 @@
-var express = require('express');
-var app = express();
+let express = require('express');
+let app = express();
 
 app.set('port', (process.env.PORT || 8080));
-app.use(express.static(__dirname + '/dist'));
+app.use(express.static(`${__dirname}/dist`));
 
-// app.get('/', function(request, response) {
-//   response.send('Hello World!');
-// });
-
-app.get('/', function(request, response) {
-	response.sendfile(__dirname + '/dist/index.html');
+app.get('/', (request, response) => {
+	response.sendfile(`${__dirname}/dist/index.html`);
 });
 
-app.listen(app.get('port'), function() {
-  console.log("Node app is running at localhost:" + app.get('port'));
+app.listen(app.get('port'), () => {
+  console.log(`Node app is running at localhost: ${app.get('port')}``);
 });
