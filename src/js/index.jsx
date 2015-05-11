@@ -4,6 +4,9 @@ import Router from 'react-router';
 import actions from './actions/Actions';
 import LikersFeed from './views/LikersFeed.jsx';
 
+// var EventEmitter = require('events').EventEmitter;
+// window.EventEmitter = new EventEmitter();
+
 let RouteHandler = Router.RouteHandler;
 let Route = Router.Route;
 // let NotFoundRoute = Router.NotFoundRoute;

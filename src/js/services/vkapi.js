@@ -27,15 +27,16 @@ var _getPhotoInfo = function( photoUrl ) {
 };
 
 var _executeGetLikers = function ( photoInfo, params ) {
-	var itemsPerPage = 5000;
-	var query = {
-		owner_id : photoInfo.owner_id,
-		item_id : photoInfo.pid,
-		itemsToLoad: itemsPerPage,
-		offset: params && params.offset || 0,
-		v : 5.28
-	},
-	likers = [];
+	let itemsPerPage = photoInfo.likedCount < 5000 ? photoInfo.likedCount : 5000,
+		query = {
+			owner_id : photoInfo.owner_id,
+			item_id : photoInfo.pid,
+			itemsToLoad: itemsPerPage,
+			offset: params && params.offset || 0,
+			v : 5.28
+		},
+		progress = 0,
+		likers = [];
 
 	return new Promise(function( resolve, reject ) {
 
@@ -47,6 +48,11 @@ var _executeGetLikers = function ( photoInfo, params ) {
 
 				if ( !response.length ) return resolve( likers );
 				likers = likers.concat( response );
+
+				progress = Math.round( likers.length * 100 / likedCount );
+
+				console.log(`Progrees: ${progress}%`);
+				// window.EventEmitter.emit('search process update', progress);
 
 				if ( likers.length < likedCount ){
 					if ( likedCount - likers.length < itemsPerPage ){
@@ -84,7 +90,7 @@ var _countLikedUsers = function( photoInfo, params ) {
 		VK.Api.call('likes.getList', query, function( response ) {
 			response = response.response;
 			if ( likedCount === 0 ) likedCount = response.count;
-			resolve( photoInfo );
+			resolve( _.extend( photoInfo, { 'likedCount': likedCount} ) );
 		});
 	});
 };

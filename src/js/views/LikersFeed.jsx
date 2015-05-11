@@ -128,7 +128,7 @@ var LikersFeed = React.createClass({
 
 		//TODO match photo id
 		// if (url) url = url.match(/\/([\w\d]+)$/)[1];
-		actions.loadLikersFromPhotoUrl( url || 'https://vk.com/only_hiki?z=photo-58832856_358993611%2Falbum-58832856_00%2Frev'
+		actions.loadLikersFromPhotoUrl( url || 'https://vk.com/only_hiki?z=photo-58832856_358993611%2Falbum-58832856_00%2Frev');
 	},
 
 	getLikersToRender: function( likers ) {

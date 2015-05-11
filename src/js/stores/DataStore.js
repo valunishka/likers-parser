@@ -1,5 +1,4 @@
 var AppDispatcher = require('../dispatchers/AppDispatcher');
-var EventEmitter = require('events').EventEmitter;
 var Constants = require('../constants/AppConstants');
 var assign = require('object-assign');
 
@@ -10,6 +9,9 @@ var _data = [];
 function addItem(title, completed=false) {
   _data.push({title, completed});
 }
+
+
+// window.EventEmitter.addListener('search process update', (progress) => { console.log(`Got it! ${progress}`)});
 
 var DataStore = assign(EventEmitter.prototype, {
 
