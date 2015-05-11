@@ -30,7 +30,7 @@ var _executeGetLikers = function ( photoInfo, params ) {
 	var itemsPerPage = 5000;
 	var query = {
 		owner_id : photoInfo.owner_id,
-		item_id : photoInfo.id,
+		item_id : photoInfo.pid,
 		itemsToLoad: itemsPerPage,
 		offset: params && params.offset || 0,
 		v : 5.28
@@ -75,7 +75,7 @@ var _countLikedUsers = function( photoInfo, params ) {
 	return new Promise(function( resolve ) {
 		var query = {
 			owner_id : photoInfo.owner_id,
-			item_id : photoInfo.id,
+			item_id : photoInfo.pid,
 			type: 'photo'
 		};
 
