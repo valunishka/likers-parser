@@ -20,13 +20,16 @@ var Panel = require('react-bootstrap/lib/Panel');
 var Modal = require('react-bootstrap/lib/Modal');
 var Infinite = require('react-infinity');
 
+var reactViewportMixin = require('react-viewport-mixin');
+
 var paginationOffset = 20;
 
 var LikersFeed = React.createClass({
 
 	mixins: [
 		Router.Navigation,
-		Reflux.listenTo(likersStore, 'onStoreUpdate')
+		Reflux.listenTo(likersStore, 'onStoreUpdate'),
+		reactViewportMixin
 	],
 
 	getInitialState: function() {
@@ -40,7 +43,11 @@ var LikersFeed = React.createClass({
 			sortOptions: likersData.settings.sortOptions,
 			filterOptions: likersData.settings.filterOptions,
 			nextPage: likersData.settings.nextPage,
-			currentPage: likersData.settings.currentPage
+			currentPage: likersData.settings.currentPage,
+      viewport: {
+        top: 0,
+        height: 0
+      }
 		};
 	},
 
@@ -77,6 +84,22 @@ var LikersFeed = React.createClass({
 			this.transitionTo('likes', { pageNum: 1 });
 		}
 	},
+
+	componentDidMount: function() {
+    window.addEventListener('scroll', this.updateViewport, false);
+    window.addEventListener('resize', this.updateViewport, false);
+    this.updateViewport();
+  },
+
+  updateViewport: function() {
+    // TODO: debounce this call
+    this.setState({
+      viewport: {
+        top: window.pageYOffset,
+        height: window.innerHeight
+      }
+    });
+  },
 
 	updateFilterBy: function(event) {
 		event.preventDefault();
@@ -165,18 +188,21 @@ var LikersFeed = React.createClass({
 			filterOptions = this.state.filterOptions,
 			cityFilter = this.state.filterOptions.cityFilter,
 			filterValues = Object.keys(filterOptions.values),
-			sortValues = Object.keys(sortOptions.values);
+			sortValues = Object.keys(sortOptions.values),
+			viewport = this.state.viewport;
 
 		likers = _.map(likers, function( liker ) {
 			if ( !_.isObject(liker) ) return;
+
 			return (
 				<Liker
 					liker={ liker }
 					filterBy={ filterOptions.values[filterOptions.currentValue] }
 					cityFilter={ cityFilter }
-					key={ liker.uid } />
+					key={ liker.uid }
+					viewport={ viewport } />
 			);
-		});
+    });
 
 		var options = sortValues.map(function(optionText, i) {
 			return <option value={ sortOptions[ i ] } key={ i }>{ optionText }</option>;
@@ -265,7 +291,6 @@ var LikersFeed = React.createClass({
 			</div>
 		);
 	}
-
 });
 
 module.exports = LikersFeed;

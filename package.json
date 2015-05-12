@@ -34,6 +34,7 @@
     "react-bootstrap": "~0.16.1",
     "react-router": "~0.12.4",
     "react-infinity": "~1.2.1",
+    "react-viewport-mixin": "0.0.3",
     "reflux": "~0.2.5",
     "moment": "~2.8.4",
     "underscore": "^1.8.1"

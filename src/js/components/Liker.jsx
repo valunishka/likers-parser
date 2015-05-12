@@ -1,12 +1,50 @@
-'use strict'
-var React   = require('react/addons');
-var actions = require('../actions/Actions');
-var moment = require('moment');
-
-var Col = require('react-bootstrap/lib/Col');
-
+let React = require('react/addons');
+let actions = require('../actions/Actions');
+let moment = require('moment');
+let LikerImage = require('./LikerImage.jsx');
+let Col = require('react-bootstrap/lib/Col');
 
 var Liker = React.createClass({
+
+  getInitialState: function() {
+    return {
+      showImage: false
+    };
+  },
+
+  getDefaultProps: function() {
+    return {
+      showImage: false
+    };
+  },
+
+  componentWillMount: function() {
+    // allow image display override
+    if (this.props.showImage) {
+      this.setShowImage(true);
+    }
+  },
+
+  updateImagePosition: function(top, height) {
+    // image is already displayed, no need to check anything
+    if (this.state.showImage) {
+      return;
+    }
+
+    // update showImage state if component element is in the viewport
+    var min = this.props.viewport.top;
+    var max = this.props.viewport.top + this.props.viewport.height;
+
+    if ((min <= (top + height) && top <= (max - 300))) {
+      this.setShowImage(true);
+    }
+  },
+
+  setShowImage: function(show) {
+    this.setState({
+      showImage: !!show
+    });
+  },
 
 	render: function() {
 		var liker = this.props.liker;
@@ -23,9 +61,17 @@ var Liker = React.createClass({
 		return (
 			<Col xs={12} md={3}>
 				<div className='profile-photo-container'>
-					<img className='profile-photo' src={ liker.photo_200 } alt='photo'/>
+          <LikerImage
+						className='profile-photo'
+						src={this.props.image}
+						alt={this.props.title}
+						viewport={this.props.viewport}
+						showImage={this.state.showImage}
+						likerImage={ liker.photo_200 }
+            updateImagePosition={this.updateImagePosition} />
+
 				</div>
-				<div className=''>
+				<div>
 					<a href={ 'https://vk.com/id' + liker.id }>{ liker['first_name'] }</a>
 					<span> { liker.bdate }</span>
 				</div>
